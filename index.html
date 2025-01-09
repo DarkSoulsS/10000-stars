@@ -32,7 +32,7 @@
         button:hover {
             background: #d62839;
         }
-        video, img {
+        video, canvas {
             margin-top: 20px;
             width: 100%;
             max-width: 400px;
@@ -49,20 +49,18 @@
     </div>
     <div id="camera" style="display: none;">
         <video id="video" autoplay></video>
+        <canvas id="canvas" style="display: none;"></canvas>
         <button id="capture">Capture Photo</button>
-        <img id="preview" style="display: none;" />
         <button id="submit" style="display: none;">Submit</button>
     </div>
-    <canvas id="canvas" style="display: none;"></canvas>
 
     <script>
         const homeDiv = document.getElementById('home');
         const cameraDiv = document.getElementById('camera');
         const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
         const captureButton = document.getElementById('capture');
         const submitButton = document.getElementById('submit');
-        const previewImage = document.getElementById('preview');
-        const canvas = document.getElementById('canvas');
 
         let capturedBlob = null;
 
@@ -89,12 +87,11 @@
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert photo to blob and display preview
+            // Pause video feed and replace it with the captured image
+            video.style.display = 'none'; // Hide video
+            canvas.style.display = 'block'; // Show captured image
             canvas.toBlob(blob => {
                 capturedBlob = blob;
-                const url = URL.createObjectURL(blob);
-                previewImage.src = url;
-                previewImage.style.display = 'block';
                 captureButton.style.display = 'none'; // Hide Capture Button
                 submitButton.style.display = 'inline-block'; // Show Submit Button
             }, 'image/jpeg', 0.7); // Compress image to 70% quality
